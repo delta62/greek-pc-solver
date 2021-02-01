@@ -17,14 +17,14 @@ impl Iterator for Solver {
     fn next(&mut self) -> Option<Self::Item> {
         let ret = self.state;
 
-        let n2 = match self.state {
+        let next = match self.state {
             (w, 11, 11, 11) => (w + 1, 0, 0, 0),
             (w,  x, 11, 11) => (w, x + 1, 0, 0),
             (w,  x,  y, 11) => (w, x, y + 1, 0),
             (w,  x,  y,  z) => (w, x, y, z + 1),
         };
 
-        self.state = n2;
+        self.state = next;
 
         if ret.0 > 11 {
             None

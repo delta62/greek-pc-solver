@@ -1,5 +1,8 @@
+/// tuple of (layer, cell value)
+pub type Cell = (usize, usize);
+
 /// A ring is a circle of 12 numbers listed in clockwise order
-type Ring = [usize; 12];
+pub type Ring = [usize; 12];
 
 /// Number of rotations (0 - 11) applied to each layer (base layer doesn't rotate).
 /// The topmost layer is index 0, and the bottom layer is index 4.
@@ -86,28 +89,37 @@ impl Puzzle {
     }
 
     fn is_42(&self, column: usize, rotation: &Rotation) -> bool {
-        (0..4).into_iter().map(|r| self.get_cell(column, r, rotation)).sum::<usize>() == 42
+        (0..4).into_iter()
+            .map(|r| self.get_cell(column, r, rotation))
+            .map(|c| c.1)
+            .sum::<usize>() == 42
     }
 
-    fn get_cell(&self, column: usize, row: usize, rotation: &Rotation) -> usize {
+    fn get_cell(&self, column: usize, row: usize, rotation: &Rotation) -> Cell {
         [ &self.l0, &self.l1, &self.l2, &self.l3, &self.l4 ]
             .iter()
-            .find_map(|layer| {
+            .enumerate()
+            .find_map(|(i, layer)| {
                 let res = layer.get_cell(column, row, rotation);
-                if res == 0 { None } else { Some(res) }
+                if res == 0 { None } else { Some((i, res)) }
             })
             .unwrap()
     }
 
-    pub fn print(&self, rotation: &Rotation) {
-        for row in 0..4 {
+    pub fn cells(&self, rotation: &Rotation) -> Vec<Vec<Cell>> {
+        let mut ret = Vec::with_capacity(4);
+
+        (0..4).for_each(|row| {
+            let mut ring = Vec::with_capacity(12);
             for column in 0..12 {
                 let cell = self.get_cell(column, row, rotation);
-                print!("{:2}, ", cell);
+                ring.push(cell);
             }
 
-            println!();
-        }
+            ret.push(ring);
+        });
+
+        ret
     }
 }
 

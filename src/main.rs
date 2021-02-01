@@ -1,23 +1,20 @@
+mod printer;
 mod puzzle;
 mod solver;
 
-use solver::Solver;
+use printer::Printer;
 use puzzle::Puzzle;
+use solver::Solver;
 
 fn main() {
     let puzzle = Puzzle::new();
-    let solver = Solver::new();
-    let mut tries = 0;
+    let mut solver = Solver::new();
 
-    for rotation in solver {
-        tries += 1;
-        if puzzle.is_solution(rotation) {
-            println!("Solution found: {:?}", rotation);
-            puzzle.print(&rotation);
-            break;
-        }
-    }
+    let cells = solver
+        .find(|rot| puzzle.is_solution(*rot))
+        .map(|rot| puzzle.cells(&rot))
+        .unwrap();
 
-    println!("Tried {} combinations", tries);
+    let printer = Printer::new();
+    printer.print(cells);
 }
-
